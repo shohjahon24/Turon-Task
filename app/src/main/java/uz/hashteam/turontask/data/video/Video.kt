@@ -6,8 +6,18 @@ data class Video(
 
 data class VideoX(
     val description: String,
-    val sources: List<String>,
+    var sources: List<String>,
     val subtitle: String,
     val thumb: String,
-    val title: String
+    val title: String,
+    var status: Int
 )
+
+class Status {
+    companion object {
+        val UNDOWNLOAD = 0
+        val DOWNLOADING = 1
+        val DOWNLOADED = 2
+        val PAUSED = 3
+    }
+}
