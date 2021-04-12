@@ -66,6 +66,7 @@ class ViewHolder(
                 when (data.status) {
                     Status.UNDOWNLOAD -> download()
                     Status.DOWNLOADING -> cancelDownload()
+                    Status.PAUSED -> cancelDownload()
                 }
             }
             it.play.setOnClickListener {
@@ -200,6 +201,4 @@ class ViewHolder(
             )
         listener?.invoke(data)
     }
-
-
 }
