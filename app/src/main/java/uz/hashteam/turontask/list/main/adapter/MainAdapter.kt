@@ -17,8 +17,9 @@ class MainAdapter(private val prefs: Prefs, private val fileManager: FileManager
 
     var callBack: VideoCallBack? = null
 
-    fun setData(data: List<VideoX>) {
+    fun setData(data: ArrayList<VideoX>) {
         this.data = data
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,6 +32,9 @@ class MainAdapter(private val prefs: Prefs, private val fileManager: FileManager
         holder.bind(data[position])
         holder.listener = {
             callBack?.onItemClick(it)
+        }
+        holder.statusListener = { v ->
+            callBack?.onStatusChanged(v)
         }
     }
 

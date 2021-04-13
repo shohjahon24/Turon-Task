@@ -1,6 +1,8 @@
 package uz.hashteam.turontask.module
 
 import org.koin.dsl.module
+import uz.hashteam.turontask.list.main.adapter.DownloadedAdapter
+import uz.hashteam.turontask.list.main.adapter.DownloadingAdapter
 import uz.hashteam.turontask.list.main.adapter.MainAdapter
 import uz.hashteam.turontask.util.FileManager
 import uz.hashteam.turontask.util.Prefs
@@ -12,4 +14,6 @@ val appModule = module {
 
 val mainModule = module {
     single { MainAdapter(get(), get()) }
+    single { DownloadedAdapter(get()) }
+    single { DownloadingAdapter() }
 }

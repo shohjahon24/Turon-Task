@@ -1,8 +1,6 @@
 package uz.hashteam.turontask.ui.main
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.EventLog
 import android.util.Log
 import android.view.View
 import android.widget.PopupWindow
@@ -11,19 +9,20 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.koin.android.ext.android.inject
 import uz.hashteam.turontask.MainActivity
 import uz.hashteam.turontask.R
-import uz.hashteam.turontask.data.video.Status
 import uz.hashteam.turontask.data.video.VideoX
 import uz.hashteam.turontask.databinding.FragmentMainBinding
+import uz.hashteam.turontask.list.main.adapter.DownloadedAdapter
 import uz.hashteam.turontask.list.main.adapter.MainAdapter
 import uz.hashteam.turontask.list.main.callback.VideoCallBack
 import uz.hashteam.turontask.util.FileManager
 
-class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
+class DownloadedFragment : Fragment(R.layout.fragment_main), VideoCallBack {
 
-    private val adapter: MainAdapter by inject()
+    private val adapter: DownloadedAdapter by inject()
     private val fileManager: FileManager by inject()
 
     lateinit var binding: FragmentMainBinding
@@ -45,11 +44,21 @@ class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
         (activity as MainActivity).let {
             data.clear()
             data.addAll(it.getVideos())
-            adapter.setData(data)
         }
+        downloadedList()
         /*binding.filter.setOnClickListener {
             showMenu()
         }*/
+    }
+
+    private fun downloadedList() {
+        edData.clear()
+        data.forEach {
+            if (fileManager.hasOfflineFile(it.sources[0], "video", true)) {
+                edData.add(it)
+            }
+        }
+        adapter.setData(edData)
     }
 
     override fun onItemClick(data: VideoX) {
@@ -64,7 +73,12 @@ class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
     }
 
     override fun onStatusChanged(data: VideoX) {
-        EventBus.getDefault().post(data)
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun updateData(video: VideoX) {
+        adapter.changeData(video)
     }
 
     override fun onStart() {
@@ -75,11 +89,6 @@ class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
     override fun onStop() {
         super.onStop()
         EventBus.getDefault().unregister(this)
-    }
-
-    @Subscribe
-    fun test(eventLog: EventLog){
-
     }
 
     // @SuppressLint("ClickableViewAccessibility")
@@ -111,17 +120,7 @@ class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
     }
 */
 
-    /*  private fun downloadedList() {
-          edData.clear()
-          data.forEach {
-              if (fileManager.hasOfflineFile(it.sources[0], "video", true)) {
-                  edData.add(it)
-              }
-          }
-          adapter.type = 2
-          Log.d("TAG", "downloadedList: ${edData.size}")
-          adapter.setData(edData)
-      }
+    /*
 
       private fun downloadingList() {
           adapter.type = 1

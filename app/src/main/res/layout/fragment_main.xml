@@ -6,33 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:background="@color/purple_500"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
-            android:text="Turon Task"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <ImageView
-            android:id="@+id/filter"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="?selectableItemBackground"
-            android:padding="16dp"
-            android:src="@drawable/ic_filter" />
-
-    </LinearLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_video"
         android:layout_width="match_parent"

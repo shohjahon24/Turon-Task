@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.downloader.*
 import kotlinx.coroutines.*
-import org.koin.experimental.property.inject
 import uz.hashteam.turontask.R
 import uz.hashteam.turontask.data.video.Status
 import uz.hashteam.turontask.data.video.VideoX
@@ -18,7 +17,6 @@ import uz.hashteam.turontask.util.Prefs
 import uz.hashteam.turontask.util.getFileSize
 import java.net.URL
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class ViewHolder(
     private val prefs: Prefs,
@@ -29,6 +27,8 @@ class ViewHolder(
 
     var listener: ((VideoX) -> Unit)? = null
 
+    var statusListener: ((VideoX) -> Unit)? = null
+
     lateinit var url: String
 
     private lateinit var data: VideoX
@@ -36,7 +36,6 @@ class ViewHolder(
     private var downloadId = 0
 
     fun bind(video: VideoX) {
-        Log.d("TAG", "bind: ")
         this.data = video
         url = video.sources[0]
         binding.let {
@@ -48,6 +47,7 @@ class ViewHolder(
                     binding.llDownload.visibility = View.GONE
                     binding.pb.visibility = View.INVISIBLE
                     videoLength()
+                    //  statusListener?.invoke(data, Status.DOWNLOADED)
                     2
                 } else {
                     binding.pb.visibility = View.INVISIBLE
@@ -60,6 +60,7 @@ class ViewHolder(
                         binding.size.text = text
                     }
                     binding.llDownload.visibility = View.VISIBLE
+                    //     statusListener?.invoke(data, Status.UNDOWNLOAD)
                     0
                 }
             it.llDownload.setOnClickListener {
@@ -118,19 +119,19 @@ class ViewHolder(
     }
 
     private fun download() {
-        Log.d("TAG", "download: ${data.title}")
         downloadId = PRDownloader.download(
             url, "${fileManager.APP_FILE_DIRECTORY_PATH}video/",
             fileManager.convertUrlToStoragePath(url, true)
         ).build().setOnStartOrResumeListener {
             binding.play.setImageResource(R.drawable.ic_pause)
             data.status = Status.DOWNLOADING
-            Log.d("TAG", "download: setOnStartOrResumeListener")
+            statusListener?.invoke(data)
         }
             .setOnCancelListener {
                 binding.pb.visibility = View.INVISIBLE
                 binding.play.setImageResource(R.drawable.ic_play)
                 data.status = Status.UNDOWNLOAD
+                statusListener?.invoke(data)
                 binding.ivDownload.setImageResource(R.drawable.ic_down_arrow)
                 val fileSize = prefs.get("file${data.title}", 0)
                 val width: Float = ((fileSize.toFloat() / 1024) / 1024)
@@ -139,6 +140,7 @@ class ViewHolder(
             }
             .setOnPauseListener {
                 data.status = Status.PAUSED
+                statusListener?.invoke(data)
                 binding.play.setImageResource(R.drawable.ic_play)
             }
             .setOnProgressListener {
@@ -155,19 +157,25 @@ class ViewHolder(
                     binding.llDownload.visibility = View.GONE
                     binding.play.setImageResource(R.drawable.ic_play)
                     data.status = Status.DOWNLOADED
+                    statusListener?.invoke(data)
                     videoLength()
                 }
 
                 override fun onError(error: Error?) {
                     binding.pb.visibility = View.INVISIBLE
                     data.status = Status.UNDOWNLOAD
+                    statusListener?.invoke(data)
+                    binding.pb.visibility = View.INVISIBLE
+                    val fileSize = prefs.get("file${data.title}", 0)
+                    val width: Float = ((fileSize.toFloat() / 1024) / 1024)
+                    val text = "%.2f Mb".format(width)
+                    binding.size.text = text
                     binding.play.setImageResource(R.drawable.ic_play)
                     binding.ivDownload.setImageResource(R.drawable.ic_down_arrow)
                 }
             })
 
 
-        Log.d("TAG", "download: $downloadId")
         // downloadRequest.onProgressListener = this
         binding.pb.visibility = View.VISIBLE
         data.status = Status.DOWNLOADING
@@ -179,7 +187,6 @@ class ViewHolder(
 
     private fun cancelDownload() {
         PRDownloader.cancel(downloadId)
-        Log.d("TAG", "cancelDownload: $downloadId")
     }
 
     private fun pauseDownload() {
