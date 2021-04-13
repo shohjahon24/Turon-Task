@@ -23,14 +23,13 @@ class DownloadingFragment : Fragment(R.layout.fragment_main) {
 
     lateinit var binding: FragmentMainBinding
 
-    private var data: ArrayList<VideoX> = ArrayList()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
         binding.listVideo.adapter = adapter
         binding.listVideo.recycledViewPool.setMaxRecycledViews(0, 10)
         binding.listVideo.setItemViewCacheSize(10)
+        adapter.setData(ArrayList())
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

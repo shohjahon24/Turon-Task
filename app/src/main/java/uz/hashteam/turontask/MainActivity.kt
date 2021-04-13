@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
             if (ext == "mp4")
                 list.add(it)
         }
-        Log.d("TAG", "getVideos: ${list.size}")
         return list
     }
 

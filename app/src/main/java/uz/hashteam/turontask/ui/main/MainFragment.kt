@@ -78,7 +78,7 @@ class MainFragment : Fragment(R.layout.fragment_main), VideoCallBack {
     }
 
     @Subscribe
-    fun test(eventLog: EventLog){
+    fun test(eventLog: EventLog) {
 
     }
 
